@@ -20,8 +20,8 @@ var defaultCorsHeaders = {
 var results = [];
 
 
-var requestHandler = function(request, response) {
-  var {headers, method, url} = request;
+var requestHandler = function (request, response) {
+  var { headers, method, url } = request;
   // console.log(headers, method, url);
 
   // Request and Response come from node's http module.
@@ -56,22 +56,22 @@ var requestHandler = function(request, response) {
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  if (method === 'GET'){
+  if (method === 'GET') {
     if (request.url !== '/classes/messages') {
       statusCode = 404;
     }
     var myObject = {
       results: results
-    }
+    };
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(myObject));
   } else if (method === 'POST') {
     results.push(request._postData);
-    // console.log(results);
+    console.log('request is: ', request);
     statusCode = 201;
     response.writeHead(statusCode, headers);
     response.end();
-  } else if(method === 'OPTIONS') {
+  } else if (method === 'OPTIONS') {
     statusCode = 204;
     response.writeHead(statusCode, headers);
     response.end();
