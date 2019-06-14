@@ -67,17 +67,15 @@ var requestHandler = function (request, response) {
     response.end(JSON.stringify(myObject));
 
   } else if (method === 'POST') {
-    results.push(request._postData);
-    console.log('request is: ', request);
+    // results.push(request._postData);
     statusCode = 201;
+    var body = '';
 
-    // request.on('data', (chunk) => {
-    //   console.log('logging chunk ', chunk);
-    //   results.push(chunk);
-    // }).on('end', () => {
-    //   results = Buffer.concat(results).toString();
-    //   // at this point, `results` has the entire request body stored in it as a string
-    // });
+    request.on('data', (chunk) => {
+      body += chunk;
+    }).on('end', () => {
+      results.push(JSON.parse(body));
+    });
 
     response.writeHead(statusCode, headers);
     response.end();
