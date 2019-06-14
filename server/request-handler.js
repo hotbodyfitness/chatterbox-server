@@ -57,19 +57,9 @@ var requestHandler = function (request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   if (method === 'GET') {
-
     if (request.url !== '/classes/messages') {
       statusCode = 404;
     }
-
-        // request.on('data', (chunk) => {
-        //   console.log('logging chunk ', chunk);
-        //   results.push(chunk);
-        // }).on('end', () => {
-        //   results = Buffer.concat(results).toString();
-        //   // at this point, `results` has the entire request body stored in it as a string
-        // });
-
     var myObject = {
       results: results
     };
@@ -80,6 +70,15 @@ var requestHandler = function (request, response) {
     results.push(request._postData);
     console.log('request is: ', request);
     statusCode = 201;
+
+    // request.on('data', (chunk) => {
+    //   console.log('logging chunk ', chunk);
+    //   results.push(chunk);
+    // }).on('end', () => {
+    //   results = Buffer.concat(results).toString();
+    //   // at this point, `results` has the entire request body stored in it as a string
+    // });
+
     response.writeHead(statusCode, headers);
     response.end();
   } else if (method === 'OPTIONS') {
