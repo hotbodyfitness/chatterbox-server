@@ -69,8 +69,8 @@ var requestHandler = function (request, response) {
     };
 
     if (request.url.includes('/')) {
-      response.writeHead(200, {'Content-Type': 'text/html'});
-      
+      response.writeHead(200, { 'Content-Type': 'text/html' });
+
       fs.readFile('./index.html', 'utf8', function (err, data) {
         response.end(data);
       });
@@ -81,32 +81,29 @@ var requestHandler = function (request, response) {
 
   } else if (method === 'POST') {
 
-  statusCode = 201;
-  var body = '';
+    statusCode = 201;
+    var body = '';
 
-  request.on('data', (chunk) => {
-    body += chunk;
-  }).on('end', () => {
-    //body = body + '<><><><><><>><>';
-    //console.log('Body before replace: ', body);
-    //Replace < and > to prevent script tags from coming in
-    body = body.replace(/</g, '');
-    body = body.replace(/>/g, '');
-    //console.log('Body after replace: ', body);
-    results.push(JSON.parse(body));
-  });
+    request.on('data', (chunk) => {
+      body += chunk;
+    }).on('end', () => {
+      //Replace < and > to prevent script tags from coming in
+      body = body.replace(/</g, '');
+      body = body.replace(/>/g, '');
+      results.push(JSON.parse(body));
+    });
 
-  response.writeHead(statusCode, headers);
-  response.end();
-} else if (method === 'OPTIONS') {
-  statusCode = 204;
-  response.writeHead(statusCode, headers);
-  response.end();
-} else {
-  statusCode = 404;
-  response.writeHead(statusCode, headers);
-  response.end();
-}
+    response.writeHead(statusCode, headers);
+    response.end();
+  } else if (method === 'OPTIONS') {
+    statusCode = 204;
+    response.writeHead(statusCode, headers);
+    response.end();
+  } else {
+    statusCode = 404;
+    response.writeHead(statusCode, headers);
+    response.end();
+  }
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
