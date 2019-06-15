@@ -96,10 +96,36 @@ describe('server', function () {
     request(requestParams, function (error, response, body) {
       // Now if we request the log, that message we posted should be there:
       request('http://127.0.0.1:3000/classes/messages', function (error, response, body) {
+        //console.log(request);
 
         expect(request._postData).to.equal(undefined);
         done();
       });
     });
   });
+
+  it('NEW TEST: Should not allow angle brackets (< >) in POST', function (done) {
+    var requestParams = {
+      method: 'POST',
+      uri: 'http://127.0.0.1:3000/classes/messages',
+      json: {
+        username: '<>Jono',
+        text: '<script>console.log("FAILED!")</script>'
+      }
+    };
+
+    request(requestParams, function (error, response, body) {
+      // Now if we request the log, that message we posted should be there:
+      request('http://127.0.0.1:3000/classes/messages', function (error, response, body) {
+        console.log("Body : ", body);
+        var bool = false;
+        if (body.includes("<") || body.includes(">")) {
+          bool = true;
+        }
+        expect(bool).to.equal(false);
+        done();
+      });
+    });
+  });
+
 });

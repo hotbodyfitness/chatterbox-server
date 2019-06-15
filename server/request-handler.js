@@ -14,7 +14,7 @@ this file and include it in basic-server.js so that it actually works.
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': 'content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key',
   'access-control-max-age': 10 // Seconds.
 };
 var results = [];
@@ -67,18 +67,20 @@ var requestHandler = function (request, response) {
     response.end(JSON.stringify(myObject));
 
   } else if (method === 'POST') {
-    var results2 = [];
-    results2.push(request._postData);
-    console.log('RESULTS 2', results2);
-    
+
     statusCode = 201;
     var body = '';
 
     request.on('data', (chunk) => {
       body += chunk;
     }).on('end', () => {
+      //body = body + '<><><><><><>><>';
+      //console.log('Body before replace: ', body);
+      //Replace < and > to prevent script tags from coming in
+      body = body.replace(/</g, '');
+      body = body.replace(/>/g, '');
+      //console.log('Body after replace: ', body);
       results.push(JSON.parse(body));
-      console.log('RESULTS 1', results);
     });
 
     response.writeHead(statusCode, headers);
@@ -92,8 +94,6 @@ var requestHandler = function (request, response) {
     response.writeHead(statusCode, headers);
     response.end();
   }
-
-
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to

@@ -65,6 +65,7 @@ describe('Node Server Request Listener Function', function() {
     // TODO: Replace with with a valid test
     // expect(res._data).to.equal(JSON.stringify('\n'));
     expect(res._ended).to.equal(true);
+    expect(req._postData).to.not.equal(undefined);
   });
 
   it('Should respond with messages that were previously posted', function() {
