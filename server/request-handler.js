@@ -67,7 +67,10 @@ var requestHandler = function (request, response) {
     response.end(JSON.stringify(myObject));
 
   } else if (method === 'POST') {
-    // results.push(request._postData);
+    var results2 = [];
+    results2.push(request._postData);
+    console.log('RESULTS 2', results2);
+    
     statusCode = 201;
     var body = '';
 
@@ -75,6 +78,7 @@ var requestHandler = function (request, response) {
       body += chunk;
     }).on('end', () => {
       results.push(JSON.parse(body));
+      console.log('RESULTS 1', results);
     });
 
     response.writeHead(statusCode, headers);
