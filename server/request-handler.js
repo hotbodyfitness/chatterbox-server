@@ -11,16 +11,20 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+
+var fs = require('fs');
+
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept, X-Parse-Application-Id, X-Parse-REST-API-Key',
+  'access-control-allow-headers': 'content-type, accept',
   'access-control-max-age': 10 // Seconds.
 };
 var results = [];
 
 
 var requestHandler = function (request, response) {
+
   var { headers, method, url } = request;
   // console.log(headers, method, url);
 
@@ -57,43 +61,52 @@ var requestHandler = function (request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   if (method === 'GET') {
-    if (request.url !== '/classes/messages') {
+    if (request.url !== '/classes/messages' || request.url !== '/') {
       statusCode = 404;
     }
     var myObject = {
       results: results
     };
-    response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(myObject));
+
+    if (request.url.includes('/')) {
+      response.writeHead(200, {'Content-Type': 'text/html'});
+      
+      fs.readFile('./index.html', 'utf8', function (err, data) {
+        response.end(data);
+      });
+    } else {
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(myObject));
+    }
 
   } else if (method === 'POST') {
 
-    statusCode = 201;
-    var body = '';
+  statusCode = 201;
+  var body = '';
 
-    request.on('data', (chunk) => {
-      body += chunk;
-    }).on('end', () => {
-      //body = body + '<><><><><><>><>';
-      //console.log('Body before replace: ', body);
-      //Replace < and > to prevent script tags from coming in
-      body = body.replace(/</g, '');
-      body = body.replace(/>/g, '');
-      //console.log('Body after replace: ', body);
-      results.push(JSON.parse(body));
-    });
+  request.on('data', (chunk) => {
+    body += chunk;
+  }).on('end', () => {
+    //body = body + '<><><><><><>><>';
+    //console.log('Body before replace: ', body);
+    //Replace < and > to prevent script tags from coming in
+    body = body.replace(/</g, '');
+    body = body.replace(/>/g, '');
+    //console.log('Body after replace: ', body);
+    results.push(JSON.parse(body));
+  });
 
-    response.writeHead(statusCode, headers);
-    response.end();
-  } else if (method === 'OPTIONS') {
-    statusCode = 204;
-    response.writeHead(statusCode, headers);
-    response.end();
-  } else {
-    statusCode = 404;
-    response.writeHead(statusCode, headers);
-    response.end();
-  }
+  response.writeHead(statusCode, headers);
+  response.end();
+} else if (method === 'OPTIONS') {
+  statusCode = 204;
+  response.writeHead(statusCode, headers);
+  response.end();
+} else {
+  statusCode = 404;
+  response.writeHead(statusCode, headers);
+  response.end();
+}
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
